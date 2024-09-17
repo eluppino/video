@@ -19,7 +19,7 @@ Create a facts-based informational video text script (10 sentences) about the fo
 
 Additional requirements:
 - Do not add any formatting of the text script, just the plain informational video script.
-- Write in a visual way so each line can be used as an input for an image generation AI tool.
+- EACH sentence uses visual language, as well as specific information, facts, and dates.
 - Don't use any line prefix or any other meta information - just the informational video text.
     """
 
@@ -48,10 +48,33 @@ def generate_images(user_prompt, script, video_size):
     paragraphs = [p for p in re.split('\. |\n', script) if p.strip() != '']
     image_urls = []
     for i, para in enumerate(paragraphs):
+
         image_prompt = f"{para.strip()}"
         image_prompt = ("a hyper-realistic photograph representing the following topic: "
                         + user_prompt + "\n\nYou can get some additional inspiration from here: " 
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
+        
+        # Create image prompt
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a professional designer."
+                },
+                {
+                    "role": "user",
+                    "content": f'Create a short image prompt delivering the core idea of the following paragraph but make sure not to add any visual element that may contain text: {image_prompt}'
+                }
+            ],
+            temperature=0.6,
+            max_tokens=300,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+        image_prompt = response.choices[0].message.content
+        
         st.write(f"🖼️ Generating image for paragraph {i+1}/{len(paragraphs)}...")
 
         try:
