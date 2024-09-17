@@ -4,6 +4,10 @@ from moviepy.editor import *
 import requests
 import re
 import os
+import random
+from PIL import Image
+from io import BytesIO
+import numpy as np
 
 # Set your OpenAI API key
 client = OpenAI(api_key=st.secrets.get("OPENAI_KEY", ""))
@@ -24,21 +28,11 @@ Additional requirements:
         messages=[
             {
                 "role": "system",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "You are a YouTube script-writer."
-                    }
-                ]
+                "content": "You are a YouTube script-writer."
             },
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": script_prompt
-                    }
-                ]
+                "content": script_prompt
             }
         ],
         temperature=0.5,
@@ -46,19 +40,16 @@ Additional requirements:
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
-        response_format={
-            "type": "text"
-        }
     )
     script = response.choices[0].message.content
     return script
 
 def generate_images(user_prompt, script, video_size):
     paragraphs = [p for p in re.split('\. |\n', script) if p.strip() != '']
-    image_paths = []
+    image_urls = []
     for i, para in enumerate(paragraphs):
         image_prompt = f"{para.strip()}"
-        image_prompt = ("a hyper-realistic photograph representing the following topic:"
+        image_prompt = ("a hyper-realistic photograph representing the following topic: "
                         + user_prompt + "\n\nYou can get some additional inspiration from here: " 
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
         st.write(f"🖼️ Generating image for paragraph {i+1}/{len(paragraphs)}...")
@@ -72,16 +63,12 @@ def generate_images(user_prompt, script, video_size):
                 size=video_size
             )
             image_url = response.data[0].url
-            image_filename = f"image_{i+1}.jpg"
-            image_data = requests.get(image_url).content
-            with open(image_filename, 'wb') as handler:
-                handler.write(image_data)
-            image_paths.append(image_filename)
+            image_urls.append(image_url)
         except Exception as e:
             st.error(f"Skipped one image due to content policy violation - proceeding with one image less")
             continue
-            
-    return image_paths
+                
+    return image_urls
 
 def create_voiceover(script, speaker_voice):
     filename = "voiceover.mp3"
@@ -93,14 +80,20 @@ def create_voiceover(script, speaker_voice):
     response.stream_to_file(filename)
     return filename
 
-def create_video(image_paths, audio_filename):
+def create_video(image_urls, audio_filename):
     audio_clip = AudioFileClip(audio_filename)
     total_duration = audio_clip.duration
-    num_images = len(image_paths)
+    num_images = len(image_urls)
     duration_per_image = total_duration / num_images
     clips = []
-    for image_path in image_paths:
-        image_clip = ImageClip(image_path).set_duration(duration_per_image)
+    for image_url in image_urls:
+        # Download image data
+        response = requests.get(image_url)
+        image_data = response.content
+        # Load image data into PIL Image
+        pil_image = Image.open(BytesIO(image_data))
+        # Create ImageClip from PIL Image
+        image_clip = ImageClip(np.array(pil_image)).set_duration(duration_per_image)
         clips.append(image_clip)
     video_clip = concatenate_videoclips(clips, method='compose')
     video_clip = video_clip.set_audio(audio_clip)
@@ -143,7 +136,7 @@ def main():
     speaker_voice_display_names = list(speaker_voice_options.keys())
 
     # Use the display names in the selectbox
-    selected_voice_display_name = st.selectbox("Select speaker voice:", speaker_voice_display_names, index=0)  # default to "Scarlett 'Her' female voice"
+    selected_voice_display_name = st.selectbox("Select speaker voice:", speaker_voice_display_names, index=0)
 
     # Get the API voice value corresponding to the selected display name
     selected_speaker_voice = speaker_voice_options[selected_voice_display_name]
@@ -152,9 +145,6 @@ def main():
         # Step 1
         st.write("✍️ Generating script...")
         script = generate_script(user_prompt)
-
-        with open("script.txt", "w") as f:
-            f.write(script)
 
         # Step 2
         st.write("🖼️ Generating images...")
@@ -165,10 +155,10 @@ def main():
                    unsafe_allow_html=True)
 
         # Create Images
-        image_paths = generate_images(user_prompt, script, selected_video_size)
+        image_urls = generate_images(user_prompt, script, selected_video_size)
 
         # Check if at least one image was generated
-        if not image_paths:
+        if not image_urls:
             st.error("No images were generated. Cannot create video.")
             return
         
@@ -178,7 +168,7 @@ def main():
 
         # Step 4
         st.write("🎬 Creating video...")
-        create_video(image_paths, audio_filename)
+        create_video(image_urls, audio_filename)
 
         # Display video
         st.video("output_video.mp4")
