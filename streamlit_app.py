@@ -101,7 +101,7 @@ def create_video(image_paths, audio_filename):
     video_clip.write_videofile("output_video.mp4", fps=24)
 
 def main():
-    st.title("🎥 Make Informational AI Videos in Minutes!")
+    st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
     # User input
     user_prompt = st.text_input("**🎨 What's Your Video Topic?**", 
