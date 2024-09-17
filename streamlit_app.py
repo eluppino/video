@@ -11,6 +11,7 @@ import numpy as np
 
 # Set your OpenAI API key
 client = OpenAI(api_key=st.secrets.get("OPENAI_KEY", ""))
+session_id = str(random.randint(0,999999999))
 
 def generate_script(prompt):
     script_prompt = f"""
@@ -94,7 +95,7 @@ def generate_images(user_prompt, script, video_size):
     return image_urls
 
 def create_voiceover(script, speaker_voice):
-    filename = f"voiceover_{random.randint(0,999999999)}.mp3"
+    filename = f"voiceover_{session_id}.mp3"
     response = client.audio.speech.create(
         model="tts-1",
         voice=speaker_voice,
@@ -121,11 +122,11 @@ def create_video(image_urls, audio_filename):
     video_clip = concatenate_videoclips(clips, method='compose')
     video_clip = video_clip.set_audio(audio_clip)
     video_clip.write_videofile(
-        "output_video.mp4",
+        f"output_video_{session_id}.mp4",
         fps=24,
         codec='libx264',
         audio_codec='aac',
-        temp_audiofile='temp-audio.m4a',
+        temp_audiofile=f'temp-audio_{session_id}.m4a',
         remove_temp=True
     )
 
@@ -278,7 +279,7 @@ def main():
         create_video(image_urls, audio_filename)
 
         # Display video
-        st.video("output_video.mp4")
+        st.video(f"output_video_{session_id}.mp4")
 
         # Indicate completion
         st.success("✅ Video generation complete!")
