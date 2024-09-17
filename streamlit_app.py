@@ -104,7 +104,7 @@ def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
     # User input
-    user_prompt = st.text_input("**🎨 What's Your Video Topic?**", 
+    user_prompt = st.text_input("**🎨 What's your video topic?**", 
                                 "Which herbs are good for women and skin?")
 
     # Video size options with display names and corresponding actual sizes
