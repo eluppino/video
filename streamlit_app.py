@@ -145,7 +145,6 @@ def main():
                        "The wonders of the deep sea",
                        "The impact of climate change on polar bears",
                        "A day in the life of a honeybee",
-                       "The history of the Great Wall of China",
                        "Exploring the solar system's planets",
                        "The evolution of smartphones",
                        "Benefits of mindfulness meditation",
@@ -204,12 +203,13 @@ def main():
     # Style the 'Generate Video' button
     st.markdown("""
         <style>
+        /* Style for the 'Generate Video' button */
         div.stButton > button {
-            font-size:36px !important;
-            padding:20px;
-            font-weight:bold;
-            background-color: linear-gradient(90deg, #ff8a00, #e52e71);
+            font-size: 24px !important;
+            padding: 20px;
+            font-weight: bold;
             color: white;
+            background: linear-gradient(90deg, #ff8a00, #e52e71);
             border: none;
             border-radius: 12px;
             cursor: pointer;
@@ -219,8 +219,27 @@ def main():
         div.stButton > button:hover {
             background: linear-gradient(90deg, #e52e71, #ff8a00);
             transform: scale(1.05);
+            color: white;
         }
-        </style>""", unsafe_allow_html=True)
+        /* Reset styles for buttons inside the expander (sample prompts) */
+        div.stExpander div.stButton > button {
+            font-size: 14px !important;
+            padding: 8px 16px;
+            font-weight: normal;
+            color: black;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: none;
+        }
+        div.stExpander div.stButton > button:hover {
+            background: #e0e0e0;
+            color: black;
+            transform: none;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
 
     if st.button("Generate Video"):
         # Step 1
