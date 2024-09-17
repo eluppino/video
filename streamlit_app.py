@@ -129,9 +129,16 @@ def create_video(image_urls, audio_filename):
         remove_temp=True
     )
 
+def update_prompt(new_prompt):
+    st.session_state.user_prompt = new_prompt
+
 def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
+    # Initialize session state variable
+    if 'user_prompt' not in st.session_state:
+        st.session_state.user_prompt = ''
+        
     # Sample prompts
     sample_prompts = ['how to make your spouse fall in love with you?',
                        'Which herbs are good for women and skin?',
@@ -147,15 +154,17 @@ def main():
                        "The cultural significance of sushi in Japan"]
     
     # User input
-    user_prompt = st.text_input("**🎨 What's your video topic?**", 
-                                st.session_state.get('user_prompt', ''), key='user_prompt')
+    user_prompt = st.text_input("**🎨 What's your video topic?**",
+                                value=st.session_state.user_prompt,
+                                key='user_prompt')
+
 
     # Expandable section for sample prompts
     with st.expander("Need inspiration? Click on a sample topic below:"):
         cols = st.columns(2)
         for i, prompt in enumerate(sample_prompts):
-            if cols[i % 2].button(prompt):
-                st.session_state.user_prompt = prompt
+            cols[i % 2].button(prompt, on_click=update_prompt, args=(prompt,), key=f"prompt_button_{i}")
+
 
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
