@@ -153,7 +153,7 @@ def main():
         st.write("🖼️ Generating images...")
         image_paths = generate_images(user_prompt, script, selected_video_size)
 
-        st.markdown('💡 <strong>Business Idea:</strong> While you wait, why not put the <a href="https://koala.sh/?via=finxter" target="_blank">best blogging AI</a> to work (opens in new tab) to generate a blog article about this topic? Use code "VIDEO" for 15% off (lifetime)', unsafe_allow_html=True)
+        st.write(f'💡 **Business Idea:** While you wait, why not put the [best blogging AI](https://koala.sh/?via=finxter) to work to generate a blog article about {user_prompt}? Use code "VIDEO" for 15% off (lifetime)')
 
         # Step 3
         st.write("🎤 Creating voiceover...")
@@ -168,7 +168,7 @@ def main():
 
         # Indicate completion
         st.success("✅ Video generation complete!")
-        st.markdown('💡 This video will look even better embedded in a blog post! Check out the <a href="https://koala.sh/?via=finxter" target="_blank">best blogging AI</a> with code "VIDEO" for 15% off (lifetime)', unsafe_allow_html=True)
+        st.write('💡 This video will look even better embedded in a blog post! Check out the [best blogging AI](https://koala.sh/?via=finxter) with code "VIDEO" for 15% off (lifetime)')
 
 
 if __name__ == "__main__":
