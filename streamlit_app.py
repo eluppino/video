@@ -129,10 +129,10 @@ def create_video(image_urls, audio_filename):
         remove_temp=True
     )
 
-
 def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
+    # Sample prompts
     sample_prompts = ['how to make your spouse fall in love with you?',
                        'Which herbs are good for women and skin?',
                        "The wonders of the deep sea",
@@ -146,17 +146,17 @@ def main():
                        "How renewable energy works",
                        "The cultural significance of sushi in Japan"]
     
+    # User input
+    user_prompt = st.text_input("**🎨 What's your video topic?**", 
+                                st.session_state.get('user_prompt', ''), key='user_prompt')
+
     # Expandable section for sample prompts
     with st.expander("Need inspiration? Click on a sample topic below:"):
         cols = st.columns(2)
         for i, prompt in enumerate(sample_prompts):
             if cols[i % 2].button(prompt):
-                st.session_state.user_prompt = prompt    
+                st.session_state.user_prompt = prompt
 
-    # User input
-    user_prompt = st.text_input("**🎨 What's your video topic?**", 
-                                sample_prompts[0], key='user_prompt')
-    
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
         "📱 Mobile (Instagram 1024x1792)": "1024x1792",
@@ -191,6 +191,18 @@ def main():
 
     # Get the API voice value corresponding to the selected display name
     selected_speaker_voice = speaker_voice_options[selected_voice_display_name]
+
+    # Style the 'Generate Video' button
+    st.markdown("""
+        <style>
+        div.stButton > button {
+            font-size:24px !important;
+            padding:20px;
+            font-weight:bold;
+            background-color: #4CAF50;
+            color: white;
+        }
+        </style>""", unsafe_allow_html=True)
 
     if st.button("Generate Video"):
         # Step 1
@@ -228,7 +240,6 @@ def main():
         st.success("✅ Video generation complete!")
         st.markdown(f'💡 This video will look even better embedded in a blog post! Check out the <a href="{aff_link}" target="_blank">best blogging AI</a> with code "VIDEO" for 15% off (lifetime)',
                    unsafe_allow_html=True)
-
 
 if __name__ == "__main__":
     main()
