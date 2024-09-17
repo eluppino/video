@@ -64,7 +64,7 @@ def generate_images(user_prompt, script, video_size):
                 },
                 {
                     "role": "user",
-                    "content": f'Create a short image prompt delivering the core idea of the following paragraph but make sure not to add any visual element that may contain text: {image_prompt}'
+                    "content": f'Create a short image prompt creating a visually appealing, beautiful image that delivers the core idea of the following paragraph - but make sure to REMOVE any visual element that may contain text: {image_prompt}'
                 }
             ],
             temperature=0.6,
