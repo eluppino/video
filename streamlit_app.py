@@ -151,10 +151,10 @@ def main():
 
         # Step 2
         st.write("🖼️ Generating images...")
+        st.write(f'💡 **Business Idea:** While you wait, why not put the [best blogging AI](https://koala.sh/?via=finxter) to work to generate a blog article about {user_prompt}? Use code "VIDEO" for 15% off (lifetime)')
         image_paths = generate_images(user_prompt, script, selected_video_size)
 
-        st.write(f'💡 **Business Idea:** While you wait, why not put the [best blogging AI](https://koala.sh/?via=finxter) to work to generate a blog article about {user_prompt}? Use code "VIDEO" for 15% off (lifetime)')
-
+        
         # Step 3
         st.write("🎤 Creating voiceover...")
         audio_filename = create_voiceover(script, selected_speaker_voice)
