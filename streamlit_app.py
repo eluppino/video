@@ -62,19 +62,25 @@ def generate_images(user_prompt, script, video_size):
                         + user_prompt + "\n\nYou can get some additional inspiration from here: " 
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
         st.write(f"🖼️ Generating image for paragraph {i+1}/{len(paragraphs)}...")
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=image_prompt,
-            n=1,
-            quality="standard",
-            size=video_size
-        )
-        image_url = response.data[0].url
-        image_filename = f"image_{i+1}.jpg"
-        image_data = requests.get(image_url).content
-        with open(image_filename, 'wb') as handler:
-            handler.write(image_data)
-        image_paths.append(image_filename)
+
+        try:
+            response = client.images.generate(
+                model="dall-e-3",
+                prompt=image_prompt,
+                n=1,
+                quality="standard",
+                size=video_size
+            )
+            image_url = response.data[0].url
+            image_filename = f"image_{i+1}.jpg"
+            image_data = requests.get(image_url).content
+            with open(image_filename, 'wb') as handler:
+                handler.write(image_data)
+            image_paths.append(image_filename)
+        except Exception as e:
+            st.error(f"Skipped one image due to content policy violation - proceeding with one image less")
+            continue
+            
     return image_paths
 
 def create_voiceover(script, speaker_voice):
@@ -157,8 +163,14 @@ def main():
         aff_link = 'https://koala.sh/?via=finxter'
         st.markdown(f'💡 **Business Idea:** While you wait, why not put the <a href="{aff_link}" target="_blank">best blogging AI</a> (opens safely in new tab) to work to generate a blog article about "{user_prompt}"? Use code "VIDEO" for 15% off (lifetime)',
                    unsafe_allow_html=True)
+
+        # Create Images
         image_paths = generate_images(user_prompt, script, selected_video_size)
 
+        # Check if at least one image was generated
+        if not image_paths:
+            st.error("No images were generated. Cannot create video.")
+            return
         
         # Step 3
         st.write("🎤 Creating voiceover...")
