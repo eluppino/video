@@ -208,7 +208,7 @@ def main():
             font-size: 24px !important;
             padding: 20px;
             font-weight: bold;
-            color: white;
+            color: white !important;
             background: linear-gradient(90deg, #ff8a00, #e52e71);
             border: none;
             border-radius: 12px;
@@ -219,7 +219,12 @@ def main():
         div.stButton > button:hover {
             background: linear-gradient(90deg, #e52e71, #ff8a00);
             transform: scale(1.05);
-            color: white;
+            color: white !important;
+        }
+        div.stButton > button:active, div.stButton > button:focus {
+            background: linear-gradient(90deg, #e52e71, #ff8a00);
+            color: white !important;
+            outline: none;
         }
         /* Reset styles for buttons inside the expander (sample prompts) */
         div.stExpander div.stButton > button {
@@ -231,6 +236,7 @@ def main():
             border: 1px solid #ccc;
             border-radius: 4px;
             box-shadow: none;
+            transition: none;
         }
         div.stExpander div.stButton > button:hover {
             background: #e0e0e0;
@@ -239,6 +245,7 @@ def main():
         }
         </style>
         """, unsafe_allow_html=True)
+
 
 
     if st.button("Generate Video"):
