@@ -61,7 +61,7 @@ def generate_images(user_prompt, script, video_size):
         image_prompt = ("a hyper-realistic photograph representing the following topic:"
                         + user_prompt + "\n\nYou can get some additional inspiration from here: " 
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
-        st.write(f"Generating image for paragraph {i+1}: {image_prompt}")
+        st.write(f"🖼️ Generating image for paragraph {i+1}/{len(paragraphs)}...")
         response = client.images.generate(
             model="dall-e-3",
             prompt=image_prompt,
@@ -101,16 +101,16 @@ def create_video(image_paths, audio_filename):
     video_clip.write_videofile("output_video.mp4", fps=24)
 
 def main():
-    st.title("AI Video Generator")
+    st.title("▶️ Create Informational AI Videos")
 
     # User input
-    user_prompt = st.text_input("Enter your prompt:", "which herbs are good for women and skin?")
+    user_prompt = st.text_input("Enter your prompt:", "Which herbs are good for women and skin?")
 
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
-        "Square (1024x1024)": "1024x1024",
-        "Instagram (mobile 1024x1792)": "1024x1792",
-        "YouTube (landscape 1792x1024)": "1792x1024"
+        "🔲 Square (1024x1024)": "1024x1024",
+        "📱 Mobile (vertical) (1024x1792)": "1024x1792",
+        "🖥️ Desktop (landscape) (1792x1024)": "1792x1024"
     }
 
     # Create a list of display names for the selectbox
@@ -124,55 +124,48 @@ def main():
 
     # Speaker voice options with display names and corresponding API values
     speaker_voice_options = {
-        "Scarlett 'Her' female voice": "shimmer",
-        "Young clear female voice": "nova",
-        "Warm female voice": "alloy",
-        "Deep female voice": "echo",
-        "Narrator female voice": "fable",
-        "Teddy bear male voice": "onyx",
+        "👩‍💻 Scarlett 'Her' female voice": "shimmer",
+        "👧 Young clear female voice": "nova",
+        "☀️ Warm female voice": "alloy",
+        "🌊 Deep female voice": "echo",
+        "📖 Narrator female voice": "fable",
+        "🧸 Teddy bear male voice": "onyx"
     }
 
     # Create a list of display names for the selectbox
     speaker_voice_display_names = list(speaker_voice_options.keys())
 
     # Use the display names in the selectbox
-    selected_voice_display_name = st.selectbox("Select speaker voice:", speaker_voice_display_names, index=4)  # default to "Young female voice"
+    selected_voice_display_name = st.selectbox("Select speaker voice:", speaker_voice_display_names, index=0)  # default to "Scarlett 'Her' female voice"
 
     # Get the API voice value corresponding to the selected display name
     selected_speaker_voice = speaker_voice_options[selected_voice_display_name]
 
     if st.button("Generate Video"):
         # Step 1
-        st.write("Generating script...")
+        st.write("✍️ Generating script...")
         script = generate_script(user_prompt)
-        # st.write("Generated Script:")
-        # st.write(script)
 
         with open("script.txt", "w") as f:
             f.write(script)
 
         # Step 2
-        st.write("Generating images...")
+        st.write("🖼️ Generating images...")
         image_paths = generate_images(user_prompt, script, selected_video_size)
 
-        # Display images
-        # for image_path in image_paths:
-        #    st.image(image_path)
-
         # Step 3
-        st.write("Creating voiceover...")
+        st.write("🎤 Creating voiceover...")
         audio_filename = create_voiceover(script, selected_speaker_voice)
-        # st.audio(audio_filename)
 
         # Step 4
-        st.write("Creating video...")
+        st.write("🎬 Creating video...")
         create_video(image_paths, audio_filename)
 
         # Display video
         st.video("output_video.mp4")
 
-        # Done
-        # st.success("Video created: output_video.mp4")
+        # Indicate completion
+        st.success("✅ Video generation complete!")
 
 if __name__ == "__main__":
     main()
