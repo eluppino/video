@@ -205,11 +205,20 @@ def main():
     st.markdown("""
         <style>
         div.stButton > button {
-            font-size:24px !important;
+            font-size:36px !important;
             padding:20px;
             font-weight:bold;
-            background-color: #4CAF50;
+            background-color: linear-gradient(90deg, #ff8a00, #e52e71);
             color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.5s, transform 0.2s;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        div.stButton > button:hover {
+            background: linear-gradient(90deg, #e52e71, #ff8a00);
+            transform: scale(1.05);
         }
         </style>""", unsafe_allow_html=True)
 
