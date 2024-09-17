@@ -94,7 +94,7 @@ def generate_images(user_prompt, script, video_size):
     return image_urls
 
 def create_voiceover(script, speaker_voice):
-    filename = "voiceover.mp3"
+    filename = f"voiceover_{random.randint(0,999999999)}.mp3"
     response = client.audio.speech.create(
         model="tts-1",
         voice=speaker_voice,
