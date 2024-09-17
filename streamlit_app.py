@@ -19,7 +19,7 @@ Create a facts-based informational video text script (10 sentences) about the fo
 
 Additional requirements:
 - Do not add any formatting of the text script, just the plain informational video script.
-- EACH sentence uses visual language, as well as specific information, facts, and dates.
+- EACH sentence uses specific information, facts, and dates.
 - Don't use any line prefix or any other meta information - just the informational video text.
     """
 
@@ -28,7 +28,7 @@ Additional requirements:
         messages=[
             {
                 "role": "system",
-                "content": "You are a YouTube script-writer."
+                "content": "You are a YouTube documentation script-writer."
             },
             {
                 "role": "user",
@@ -50,7 +50,7 @@ def generate_images(user_prompt, script, video_size):
     for i, para in enumerate(paragraphs):
 
         image_prompt = f"{para.strip()}"
-        image_prompt = ("a hyper-realistic photograph representing the following topic: "
+        image_prompt = ("a photograph representing the following topic: "
                         + user_prompt + "\n\nYou can get some additional inspiration from here: " 
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
         
@@ -64,7 +64,7 @@ def generate_images(user_prompt, script, video_size):
                 },
                 {
                     "role": "user",
-                    "content": f'Create a short image prompt creating a visually appealing, beautiful image that delivers the core idea of the following paragraph - but make sure to REMOVE any visual element that may contain text: {image_prompt}'
+                    "content": f'Create a short image prompt creating a visually appealing, beautiful photograph that delivers the core idea of the following paragraph - but make sure to REMOVE any visual element that may contain text: {image_prompt}'
                 }
             ],
             temperature=0.6,
