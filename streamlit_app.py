@@ -120,14 +120,18 @@ def create_video(image_urls, audio_filename):
         clips.append(image_clip)
     video_clip = concatenate_videoclips(clips, method='compose')
     video_clip = video_clip.set_audio(audio_clip)
-    video_clip.write_videofile("output_video.mp4", fps=24)
+    video_clip.write_videofile(
+        "output_video.mp4",
+        fps=24,
+        codec='libx264',
+        audio_codec='aac',
+        temp_audiofile='temp-audio.m4a',
+        remove_temp=True
+    )
+
 
 def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
-
-    # User input
-    user_prompt = st.text_input("**🎨 What's your video topic?**", 
-                                sample_prompts[0], key='user_prompt')
 
     sample_prompts = ['how to make your spouse fall in love with you?',
                        'Which herbs are good for women and skin?',
@@ -148,6 +152,10 @@ def main():
         for i, prompt in enumerate(sample_prompts):
             if cols[i % 2].button(prompt):
                 st.session_state.user_prompt = prompt    
+
+    # User input
+    user_prompt = st.text_input("**🎨 What's your video topic?**", 
+                                sample_prompts[0], key='user_prompt')
     
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
