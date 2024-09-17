@@ -101,10 +101,10 @@ def create_video(image_paths, audio_filename):
     video_clip.write_videofile("output_video.mp4", fps=24)
 
 def main():
-    st.title("🎥 Create Informational AI Videos in Minutes!")
+    st.title("🎥 Make Informational AI Videos in Minutes!")
 
     # User input
-    user_prompt = st.text_input("**Enter your createive prompt below:**", 
+    user_prompt = st.text_input("**🎨 What's Your Video Topic?**", 
                                 "Which herbs are good for women and skin?")
 
     # Video size options with display names and corresponding actual sizes
