@@ -125,6 +125,10 @@ def create_video(image_urls, audio_filename):
 def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
+    # User input
+    user_prompt = st.text_input("**🎨 What's your video topic?**", 
+                                sample_prompts[0], key='user_prompt')
+
     sample_prompts = ['how to make your spouse fall in love with you?',
                        'Which herbs are good for women and skin?',
                        "The wonders of the deep sea",
@@ -143,13 +147,7 @@ def main():
         cols = st.columns(2)
         for i, prompt in enumerate(sample_prompts):
             if cols[i % 2].button(prompt):
-                st.session_state.user_prompt = prompt
-
-    # User input
-    user_prompt = st.text_input("**🎨 What's your video topic?**", 
-                                sample_prompts[0], key='user_prompt')
-
-    
+                st.session_state.user_prompt = prompt    
     
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
