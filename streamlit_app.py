@@ -6,8 +6,7 @@ import re
 import os
 
 # Set your OpenAI API key
-api_key = "your-api-key"  # Replace with your actual API key
-client = OpenAI(api_key=api_key)
+client = OpenAI(api_key=st.secrets.get("OPENAI_KEY", ""))
 
 def generate_script(prompt):
     script_prompt = f"""
