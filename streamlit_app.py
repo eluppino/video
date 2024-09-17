@@ -151,7 +151,7 @@ def main():
 
         # Step 2
         st.write("🖼️ Generating images...")
-        st.write(f'💡 **Business Idea:** While you wait, why not put the [best blogging AI](https://koala.sh/?via=finxter) to work to generate a blog article about {user_prompt}? Use code "VIDEO" for 15% off (lifetime)')
+        st.write(f'💡 **Business Idea:** While you wait, why not put the [best blogging AI](https://koala.sh/?via=finxter) to work to generate a blog article about "{user_prompt}"? Use code "VIDEO" for 15% off (lifetime)')
         image_paths = generate_images(user_prompt, script, selected_video_size)
 
         
