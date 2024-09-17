@@ -125,10 +125,32 @@ def create_video(image_urls, audio_filename):
 def main():
     st.title("🎥 The Only 100% Free AI Video Creator - No Signup, No Redirects, No Fees!")
 
+    sample_prompts = ['how to make your spouse fall in love with you?',
+                       'Which herbs are good for women and skin?',
+                       "The wonders of the deep sea",
+                       "The impact of climate change on polar bears",
+                       "A day in the life of a honeybee",
+                       "The history of the Great Wall of China",
+                       "Exploring the solar system's planets",
+                       "The evolution of smartphones",
+                       "Benefits of mindfulness meditation",
+                       "The process of photosynthesis",
+                       "How renewable energy works",
+                       "The cultural significance of sushi in Japan"]
+    
+    # Expandable section for sample prompts
+    with st.expander("Need inspiration? Click on a sample topic below:"):
+        cols = st.columns(2)
+        for i, prompt in enumerate(sample_prompts):
+            if cols[i % 2].button(prompt):
+                st.session_state.user_prompt = prompt
+
     # User input
     user_prompt = st.text_input("**🎨 What's your video topic?**", 
-                                "Which herbs are good for women and skin?")
+                                sample_prompts[0], key='user_prompt')
 
+    
+    
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
         "📱 Mobile (Instagram 1024x1792)": "1024x1792",
