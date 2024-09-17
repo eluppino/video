@@ -108,16 +108,16 @@ def main():
 
     # Video size options with display names and corresponding actual sizes
     video_size_options = {
-        "🔲 Square (1024x1024)": "1024x1024",
-        "📱 Mobile (vertical) (1024x1792)": "1024x1792",
-        "🖥️ Desktop (landscape) (1792x1024)": "1792x1024"
+        "📱 Mobile (Instagram 1024x1792)": "1024x1792",
+        "🖥️ Desktop (YouTube 1792x1024)": "1792x1024",
+        "🔲 Square (Flexible 1024x1024)": "1024x1024",
     }
 
     # Create a list of display names for the selectbox
     video_size_display_names = list(video_size_options.keys())
 
     # Use the display names in the selectbox
-    selected_size_display_name = st.selectbox("Select video size:", video_size_display_names, index=0)  # default to "Square (1024x1024)"
+    selected_size_display_name = st.selectbox("Select video size:", video_size_display_names, index=0)  # default to 0
 
     # Get the actual video size value
     selected_video_size = video_size_options[selected_size_display_name]
