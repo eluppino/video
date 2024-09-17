@@ -1,5 +1,5 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 from moviepy.editor import *
 import requests
 import re
@@ -10,7 +10,9 @@ from io import BytesIO
 import numpy as np
 
 # Set your OpenAI API key
-openai.api_key = st.secrets.get("OPENAI_KEY", "")
+client = OpenAI(api_key=st.secrets.get("OPENAI_KEY", ""))
+# Removed global session_id
+# session_id = str(random.randint(0,999999999))
 
 def generate_script(prompt):
     script_prompt = f"""
@@ -23,7 +25,7 @@ Additional requirements:
 - Don't use any line prefix or any other meta information - just the informational video text.
     """
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {
@@ -41,7 +43,7 @@ Additional requirements:
         frequency_penalty=0,
         presence_penalty=0,
     )
-    script = response['choices'][0]['message']['content']
+    script = response.choices[0].message.content
     return script
 
 def generate_images(user_prompt, script, video_size):
@@ -55,8 +57,8 @@ def generate_images(user_prompt, script, video_size):
                         + image_prompt + "\n\n IMPORTANT: DON'T ADD ANY TEXT IN THE IMAGE!!!!")
         
         # Create image prompt
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
@@ -73,36 +75,34 @@ def generate_images(user_prompt, script, video_size):
             frequency_penalty=0,
             presence_penalty=0,
         )
-        image_prompt = response['choices'][0]['message']['content']
+        image_prompt = response.choices[0].message.content
         
         st.write(f"🖼️ Generating image for paragraph {i+1}/{len(paragraphs)}...")
 
         try:
-            response = openai.Image.create(
+            response = client.images.generate(
+                model="dall-e-3",
                 prompt=image_prompt,
                 n=1,
+                quality="standard",
                 size=video_size
             )
-            image_url = response['data'][0]['url']
+            image_url = response.data[0].url
             image_urls.append(image_url)
         except Exception as e:
-            st.error("Skipped one image due to content policy violation - proceeding with one image less")
+            st.error(f"Skipped one image due to content policy violation - proceeding with one image less")
             continue
                 
     return image_urls
 
 def create_voiceover(script, speaker_voice):
     filename = f"voiceover_{st.session_state.session_id}.mp3"
-    response = openai.Audio.create(
-        model="whisper-1",
-        prompt=script,
-        response_format="url",
-        voice=speaker_voice
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice=speaker_voice,
+        input=script
     )
-    audio_url = response['url']
-    audio_data = requests.get(audio_url).content
-    with open(filename, 'wb') as f:
-        f.write(audio_data)
+    response.stream_to_file(filename)
     return filename
 
 def create_video(image_urls, audio_filename):
@@ -116,7 +116,7 @@ def create_video(image_urls, audio_filename):
         response = requests.get(image_url)
         image_data = response.content
         # Load image data into PIL Image
-        pil_image = Image.open(BytesIO(image_data)).convert('RGB')
+        pil_image = Image.open(BytesIO(image_data))
         # Create ImageClip from PIL Image
         image_clip = ImageClip(np.array(pil_image)).set_duration(duration_per_image)
         clips.append(image_clip)
@@ -143,12 +143,13 @@ def main():
     if 'user_prompt' not in st.session_state:
         st.session_state.user_prompt = ''
         
+    # Generate a unique session_id per user session
     if 'session_id' not in st.session_state:
         st.session_state.session_id = str(random.randint(0, 999999999))
         
     # Sample prompts
     sample_prompts = [
-        'How to make your spouse fall in love with you?',
+        'how to make your spouse fall in love with you?',
         'Which herbs are good for women and skin?',
         "The wonders of the deep sea",
         "The impact of climate change on polar bears",
@@ -256,11 +257,11 @@ def main():
         """, unsafe_allow_html=True)
 
     if st.button("Generate Video"):
-        # Step 1: Generate Script
+        # Step 1
         st.write("✍️ Generating script...")
         script = generate_script(user_prompt)
 
-        # Step 2: Generate Images
+        # Step 2
         st.write("🖼️ Generating images...")
 
         # Affiliate Link Placement
@@ -281,11 +282,11 @@ def main():
             st.error("No images were generated. Cannot create video.")
             return
         
-        # Step 3: Create Voiceover
+        # Step 3
         st.write("🎤 Creating voiceover...")
         audio_filename = create_voiceover(script, selected_speaker_voice)
 
-        # Step 4: Create Video
+        # Step 4
         st.write("🎬 Creating video...")
         video_filename = create_video(image_urls, audio_filename)
 
