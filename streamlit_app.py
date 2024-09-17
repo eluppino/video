@@ -10,7 +10,7 @@ client = OpenAI(api_key=st.secrets.get("OPENAI_KEY", ""))
 
 def generate_script(prompt):
     script_prompt = f"""
-Create a facts-based informational video text script (10 sentences) that answers the following question:
+Create a facts-based informational video text script (10 sentences) about the following topic:
 {prompt}
 
 Additional requirements:
@@ -53,7 +53,7 @@ Additional requirements:
     script = response.choices[0].message.content
     return script
 
-def generate_images(user_prompt, script):
+def generate_images(user_prompt, script, video_size):
     paragraphs = [p for p in re.split('\. |\n', script) if p.strip() != '']
     image_paths = []
     for i, para in enumerate(paragraphs):
@@ -67,7 +67,7 @@ def generate_images(user_prompt, script):
             prompt=image_prompt,
             n=1,
             quality="standard",
-            size="1024x1024"
+            size=video_size
         )
         image_url = response.data[0].url
         image_filename = f"image_{i+1}.jpg"
@@ -77,11 +77,11 @@ def generate_images(user_prompt, script):
         image_paths.append(image_filename)
     return image_paths
 
-def create_voiceover(script):
+def create_voiceover(script, speaker_voice):
     filename = "voiceover.mp3"
     response = client.audio.speech.create(
         model="tts-1",
-        voice="onyx",
+        voice=speaker_voice,
         input=script
     )
     response.stream_to_file(filename)
@@ -106,28 +106,63 @@ def main():
     # User input
     user_prompt = st.text_input("Enter your prompt:", "which herbs are good for women and skin?")
 
+    # Video size options with display names and corresponding actual sizes
+    video_size_options = {
+        "Square (1024x1024)": "1024x1024",
+        "Instagram (mobile 1024x1792)": "1024x1792",
+        "YouTube (landscape 1792x1024)": "1792x1024"
+    }
+
+    # Create a list of display names for the selectbox
+    video_size_display_names = list(video_size_options.keys())
+
+    # Use the display names in the selectbox
+    selected_size_display_name = st.selectbox("Select video size:", video_size_display_names, index=0)  # default to "Square (1024x1024)"
+
+    # Get the actual video size value
+    selected_video_size = video_size_options[selected_size_display_name]
+
+    # Speaker voice options with display names and corresponding API values
+    speaker_voice_options = {
+        "Scarlett 'Her' female voice": "shimmer",
+        "Young clear female voice": "nova",
+        "Warm female voice": "alloy",
+        "Deep female voice": "echo",
+        "Narrator female voice": "fable",
+        "Teddy bear male voice": "onyx",
+    }
+
+    # Create a list of display names for the selectbox
+    speaker_voice_display_names = list(speaker_voice_options.keys())
+
+    # Use the display names in the selectbox
+    selected_voice_display_name = st.selectbox("Select speaker voice:", speaker_voice_display_names, index=4)  # default to "Young female voice"
+
+    # Get the API voice value corresponding to the selected display name
+    selected_speaker_voice = speaker_voice_options[selected_voice_display_name]
+
     if st.button("Generate Video"):
         # Step 1
         st.write("Generating script...")
         script = generate_script(user_prompt)
-        st.write("Generated Script:")
-        st.write(script)
+        # st.write("Generated Script:")
+        # st.write(script)
 
         with open("script.txt", "w") as f:
             f.write(script)
 
         # Step 2
         st.write("Generating images...")
-        image_paths = generate_images(user_prompt, script)
+        image_paths = generate_images(user_prompt, script, selected_video_size)
 
         # Display images
-        for image_path in image_paths:
-            st.image(image_path)
+        # for image_path in image_paths:
+        #    st.image(image_path)
 
         # Step 3
         st.write("Creating voiceover...")
-        audio_filename = create_voiceover(script)
-        st.audio(audio_filename)
+        audio_filename = create_voiceover(script, selected_speaker_voice)
+        # st.audio(audio_filename)
 
         # Step 4
         st.write("Creating video...")
@@ -137,7 +172,7 @@ def main():
         st.video("output_video.mp4")
 
         # Done
-        st.success("Video created: output_video.mp4")
+        # st.success("Video created: output_video.mp4")
 
 if __name__ == "__main__":
     main()
